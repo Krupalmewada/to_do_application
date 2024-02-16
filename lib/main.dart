@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'toDoCard.dart';
 import 'task_const.dart';
-import 'helperClass.dart';
+import 'HiveAdapter.dart';
+import 'package:hive/hive.dart';
+import 'hive_DataBase.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(TaskAdapter());
+  await Hive.openBox<Task>('myBox');
   runApp(
       MaterialApp(
         home: Home(isSwitched: false,),
@@ -24,28 +30,21 @@ late SharedPreferences sp ;
 late List<Task> tasks =[];
 late List<Task> filteredTasks = [];
 class _HomeState extends State<Home> {
-  final TextEditingController searchController = TextEditingController();
 
+  final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    loadTasks();
-
+    loadHive();
   }
-  void insertTask(Task task) async {
-    await DatabaseHelper.insertTask(task);
-    await loadTasks();
-  }
-
-  Future<void> loadTasks() async {
-    List<Task> retrievedTasks = await DatabaseHelper.getTasks();
+  Future<void> loadHive() async {
+    List<Task> retrievedTasks = await HiveData.retrieveHive();
     setState(() {
       tasks = retrievedTasks;
     });
     sp = await SharedPreferences.getInstance();
     widget.isSwitched = sp.getBool("isSwitched")!;
-
   }
 
   void onQueryChanged(String query) {
@@ -121,7 +120,7 @@ class _HomeState extends State<Home> {
           Expanded(
             child: ToDoCard(
                 tasks1: searchController.text.isEmpty ? tasks : filteredTasks,
-                onSaveData: loadTasks,
+                onSaveData: loadHive,
                 isSwitched:widget.isSwitched
             ),
           ),
@@ -158,12 +157,11 @@ class _HomeState extends State<Home> {
           );
           setState(() {
             Task newTask = Task(text: newTaskText, checkbox: false);
-            insertTask(newTask);
+            HiveData.insertHive(newTask);
             tasks.add(newTask);
             textController.clear();
 
           });
-          // loadTasks();
 
         },
         shape: const RoundedRectangleBorder(
@@ -183,4 +181,5 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
 

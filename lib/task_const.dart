@@ -1,20 +1,12 @@
+import 'package:hive/hive.dart';
 
-class Task{
+@HiveType(typeId: 0)
+class Task extends HiveObject {
+  @HiveField(0)
+  late String text;
 
-  String text ="";
-  bool checkbox=false;
-  Task({required this.text,required this.checkbox});
-  Map<String, dynamic> toMap() {
-    return {
-      // text : checkbox,
-      "text":text,
-      "checkbox":checkbox
-    };
-  }
-  factory Task.fromMap(Map<String, dynamic> map) {
-    return Task(
-      text: map['text']??=[],
-      checkbox: map['checkbox']??=[],
-    );
-  }
+  @HiveField(1)
+  late bool checkbox;
+
+  Task({required this.text, required this.checkbox});
 }

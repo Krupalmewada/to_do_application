@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_application/main.dart';
 import 'task_const.dart';
-import 'helperClass.dart';
+import 'hive_DataBase.dart';
 
 
 class ToDoCard extends StatefulWidget {
   final List<Task> tasks1;
   final Future<void> Function()? onSaveData;
   final bool isSwitched;
-  // const ToDoCard(this.tasks, {required this.onSaveData,super.key});
   const ToDoCard({required this.tasks1, required this.onSaveData, Key? key,required this.isSwitched}) : super(key: key);
   @override
   State<ToDoCard> createState() => _ToDoCardState();
@@ -118,14 +118,15 @@ class _ToDoCardState extends State<ToDoCard> {
                 ).then((newText1) {
                   if (newText1 != null && newText1.trim().isNotEmpty) {
                     setState(() {
-                      if (newText1 != null && newText1.trim().isNotEmpty) {
-                        setState(() {
-                          DatabaseHelper.updateTask(task.text, Task(text: newText1, checkbox: task.checkbox));
-                          widget.tasks1[index].text = newText1;
-                        });
-                        widget.onSaveData?.call();
-
+                      if (filteredTasks.isNotEmpty) {
+                        int filteredIndex = filteredTasks.indexWhere((filteredTask) => filteredTask.text == task.text);
+                        if (filteredIndex != -1) {
+                          filteredTasks[filteredIndex] = Task(text: newText1, checkbox: task.checkbox);
+                        }
                       }
+                      HiveData.updateHive(task.text,Task(text: newText1,checkbox: task.checkbox));
+                      widget.onSaveData?.call();
+
                     });
                   }});}
               else {
@@ -147,12 +148,9 @@ class _ToDoCardState extends State<ToDoCard> {
                         onPressed: () {
                           Navigator.pop(context, true);
                           setState(() {
-                            DatabaseHelper.deleteTask(widget.tasks1[index].text).then((_) {
-                              setState(() {
-                                widget.tasks1.removeAt(index);
-                              });
-                              widget.onSaveData?.call();
-                            });
+                            HiveData.deleteHive(task.text);
+                            widget.tasks1.removeAt(index);
+                            widget.onSaveData?.call();
                           });
                         },
                         child: const Text('Delete',style: TextStyle(color: Colors.black),),
@@ -180,7 +178,9 @@ class _ToDoCardState extends State<ToDoCard> {
                   onChanged: (newBool) {
                     setState(() {
                       task.checkbox = newBool!;
-                      DatabaseHelper.updateTask(task.text, task);
+                      // DatabaseHelper.updateTask(task.text, task);
+                      HiveData.updateHive(task.text, task);
+                      widget.onSaveData?.call();
                     });
                   },
                 ),
@@ -200,6 +200,7 @@ class _ToDoCardState extends State<ToDoCard> {
   }
 
 }
+
 
 
 
