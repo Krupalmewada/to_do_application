@@ -24,16 +24,12 @@ late SharedPreferences sp ;
 late List<Task> tasks =[];
 late List<Task> filteredTasks = [];
 class _HomeState extends State<Home> {
-  // late List<Task> allTasks = [];
-
   final TextEditingController searchController = TextEditingController();
 
-  // late TaskManager taskManager;
 
   @override
   void initState() {
     super.initState();
-    // taskManager = TaskManager();
     loadTasks();
 
   }
@@ -41,15 +37,7 @@ class _HomeState extends State<Home> {
     await DatabaseHelper.insertTask(task);
     await loadTasks();
   }
-  // void updateTask(Task task) async {
-  //   // await DatabaseHelper.updateTask(task);
-  //   await loadTasks();
-  // }
-  // void deleteTask(String text) async {
-  //   await DatabaseHelper.deleteTask(text);
-  //   await loadTasks();
-  //
-  // }
+
   Future<void> loadTasks() async {
     List<Task> retrievedTasks = await DatabaseHelper.getTasks();
     setState(() {
@@ -59,19 +47,14 @@ class _HomeState extends State<Home> {
     widget.isSwitched = sp.getBool("isSwitched")!;
 
   }
-  // Future<void> initTaskManager() async {
-  //   await taskManager.initSharedPreferences();
-  //   loaddata();
-  // }
+
   void onQueryChanged(String query) {
     setState(() {
       if (query.isEmpty) {
-        // If the search query is empty, show all tasks
         filteredTasks.clear();
         filteredTasks = List.from(tasks);
 
       } else {
-        // Filter the tasks based on the search query
         filteredTasks = tasks.where((task) =>
             task.text.toLowerCase().contains(query.toLowerCase())).toList();
       }
@@ -82,16 +65,6 @@ class _HomeState extends State<Home> {
     sp.setBool("isSwitched", widget.isSwitched);
   }
 
-  // void loaddata() async {
-  //   List<Task> loadedTasks = await taskManager.loadData();
-  //   setState(() {
-  //     tasks = loadedTasks;
-  //   });
-  // }
-
-  // Future<void> savedata() async {
-  //   await taskManager.saveData(tasks);
-  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,7 +178,6 @@ class _HomeState extends State<Home> {
         ),
       ),
 
-      // child: const Icon(Icons.add,color:Colors.black ,size: 30.0,),
 
 
     );

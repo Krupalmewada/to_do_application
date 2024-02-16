@@ -14,12 +14,10 @@ class ToDoCard extends StatefulWidget {
 }
 
 class _ToDoCardState extends State<ToDoCard> {
-  // late TaskManager taskManager;
 
   @override
   void initState() {
     super.initState();
-    // taskManager = TaskManager();
   }
 
   @override
@@ -89,7 +87,6 @@ class _ToDoCardState extends State<ToDoCard> {
 
         return Dismissible(
             key:  UniqueKey(),
-            // key: ValueKey(widget.l1[index]),
             background: slideRightBackground(),
             secondaryBackground: slideLeftBackground(),
             onDismissed: (direction) {
@@ -97,16 +94,6 @@ class _ToDoCardState extends State<ToDoCard> {
 
               }
             },
-            // widget.onSaveData?.call();
-            // widget.tasks1.removeAt(index);
-            // setState(() {
-            // DatabaseHelper.deleteTask(task.text);
-            // widget.tasks1.removeAt(index);
-            //   DatabaseHelper.deleteTask(task.text);
-            //   // DatabaseHelper.deleteTask(widget.tasks1[index].text);
-            //   widget.tasks1.removeAt(index);
-            //   widget.onSaveData?.call();
-            // // taskManager.saveData(widget.tasks1.cast<Task>());
             confirmDismiss: (direction) async {
               if (direction == DismissDirection.startToEnd) {
                 String lastData = widget.tasks1[index].text;
@@ -137,7 +124,6 @@ class _ToDoCardState extends State<ToDoCard> {
                           widget.tasks1[index].text = newText1;
                         });
                         widget.onSaveData?.call();
-                        // taskManager.saveData(widget.tasks1.cast<Task>());
 
                       }
                     });
@@ -161,24 +147,12 @@ class _ToDoCardState extends State<ToDoCard> {
                         onPressed: () {
                           Navigator.pop(context, true);
                           setState(() {
-                            // print(index);
-                            // print(tasks);
                             DatabaseHelper.deleteTask(widget.tasks1[index].text).then((_) {
                               setState(() {
                                 widget.tasks1.removeAt(index);
                               });
                               widget.onSaveData?.call();
                             });
-                            // if(filteredTasks!=null){
-                            //   var text1 = widget.tasks1[index].text;
-                            //   int og_lis_ind=tasks.indexWhere((task)=>task.text==text1);
-                            //   print(og_lis_ind);
-                            //   tasks.removeAt(og_lis_ind);
-                            //
-                            // }
-                            // widget.tasks1.removeAt(index);
-                            // widget.onSaveData?.call();
-                            // taskManager.saveData(widget.tasks1.cast<Task>());
                           });
                         },
                         child: const Text('Delete',style: TextStyle(color: Colors.black),),
@@ -207,11 +181,6 @@ class _ToDoCardState extends State<ToDoCard> {
                     setState(() {
                       task.checkbox = newBool!;
                       DatabaseHelper.updateTask(task.text, task);
-                      // widget.onSaveData?.call();
-                      // taskManager.saveData(widget.tasks1.cast<Task>());
-                      // task.checkbox = !task.checkbox;
-                      // updateTask(task);
-                      // loadTasks();
                     });
                   },
                 ),
