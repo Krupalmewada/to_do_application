@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
-import 'saveData.dart';
 import 'task_const.dart';
-import 'main.dart';
+import 'helperClass.dart';
+
 
 class ToDoCard extends StatefulWidget {
   final List<Task> tasks1;
   final Future<void> Function()? onSaveData;
   final bool isSwitched;
   // const ToDoCard(this.tasks, {required this.onSaveData,super.key});
-  const ToDoCard({required this.tasks1, required this.onSaveData, Key? key, required this.isSwitched})
-      : super(key: key);
+  const ToDoCard({required this.tasks1, required this.onSaveData, Key? key,required this.isSwitched}) : super(key: key);
   @override
   State<ToDoCard> createState() => _ToDoCardState();
 }
 
 class _ToDoCardState extends State<ToDoCard> {
-  late TaskManager taskManager;
+  // late TaskManager taskManager;
 
   @override
   void initState() {
     super.initState();
-    taskManager = TaskManager();
+    // taskManager = TaskManager();
   }
 
   @override
@@ -28,7 +27,7 @@ class _ToDoCardState extends State<ToDoCard> {
     return ListView.builder(
       itemCount: widget.tasks1.length,
       itemBuilder: (BuildContext context, int index) {
-        Task task = widget.tasks1[index] as Task;
+        Task task = widget.tasks1[index] ;
         Widget slideRightBackground() {
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
@@ -58,7 +57,6 @@ class _ToDoCardState extends State<ToDoCard> {
             ),
           );
         }
-
         Widget slideLeftBackground() {
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
@@ -90,20 +88,25 @@ class _ToDoCardState extends State<ToDoCard> {
         }
 
         return Dismissible(
-            key: UniqueKey(),
+            key:  UniqueKey(),
             // key: ValueKey(widget.l1[index]),
             background: slideRightBackground(),
             secondaryBackground: slideLeftBackground(),
             onDismissed: (direction) {
               if (direction == DismissDirection.endToStart) {
-                // setState(() {
-                //   // widget.tasks1.removeAt(index);
-                //   // widget.onSaveData?.call();
-                //   // taskManager.saveData(widget.tasks1.cast<Task>());
-                //
-                // });
+
               }
             },
+            // widget.onSaveData?.call();
+            // widget.tasks1.removeAt(index);
+            // setState(() {
+            // DatabaseHelper.deleteTask(task.text);
+            // widget.tasks1.removeAt(index);
+            //   DatabaseHelper.deleteTask(task.text);
+            //   // DatabaseHelper.deleteTask(widget.tasks1[index].text);
+            //   widget.tasks1.removeAt(index);
+            //   widget.onSaveData?.call();
+            // // taskManager.saveData(widget.tasks1.cast<Task>());
             confirmDismiss: (direction) async {
               if (direction == DismissDirection.startToEnd) {
                 String lastData = widget.tasks1[index].text;
@@ -112,15 +115,16 @@ class _ToDoCardState extends State<ToDoCard> {
                   barrierDismissible: false,
                   context: context,
                   builder: (context) => AlertDialog(
+                    backgroundColor: widget.isSwitched? const Color(0xff98a1a5):
+                    const Color(0xffa6d0db),
                     title: const Text('Edit Task'),
                     content: TextField(
                       controller: textController,
                     ),
                     actions: [
                       TextButton(
-                        onPressed: () =>
-                            Navigator.pop(context, textController.text),
-                        child: const Text('Edit'),
+                        onPressed: () => Navigator.pop(context, textController.text),
+                        child: const Text('Edit',style: TextStyle(color: Colors.black),),
                       ),
                     ],
                   ),
@@ -129,78 +133,107 @@ class _ToDoCardState extends State<ToDoCard> {
                     setState(() {
                       if (newText1 != null && newText1.trim().isNotEmpty) {
                         setState(() {
-                          // Update the task text in the list
+                          DatabaseHelper.updateTask(task.text, Task(text: newText1, checkbox: task.checkbox));
                           widget.tasks1[index].text = newText1;
                         });
-                        // Save the updated task data
                         widget.onSaveData?.call();
-                        taskManager.saveData(widget.tasks1.cast<Task>());
+                        // taskManager.saveData(widget.tasks1.cast<Task>());
+
                       }
                     });
-                  }
-                });
-              } else {
+                  }});}
+              else {
                 // Handle deletion:
                 return await showDialog<bool>(
+
                   context: context,
                   builder: (context) => AlertDialog(
+                    backgroundColor: widget.isSwitched? const Color(0xff98a1a5):
+                    const Color(0xffa6d0db),
                     title: const Text('Delete Task'),
-                    content: const Text(
-                        'Are you sure you want to delete this task?'),
+                    content: const Text('Are you sure you want to delete this task?'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Cancel'),
+                        child: const Text('Cancel',style: TextStyle(color: Colors.black),),
                       ),
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context, true);
                           setState(() {
-                            if (filteredTasks.isNotEmpty) {
-                              var text1 = widget.tasks1[index].text;
-                              int og_lis_ind = tasks.indexWhere((task) => task.text == text1);
-                              tasks.removeAt(og_lis_ind);
-                            }
-                            widget.tasks1.removeAt(index);
-                            taskManager.saveData(widget.tasks1.cast<Task>());
-
-                          });widget.onSaveData?.call();
+                            // print(index);
+                            // print(tasks);
+                            DatabaseHelper.deleteTask(widget.tasks1[index].text).then((_) {
+                              setState(() {
+                                widget.tasks1.removeAt(index);
+                              });
+                              widget.onSaveData?.call();
+                            });
+                            // if(filteredTasks!=null){
+                            //   var text1 = widget.tasks1[index].text;
+                            //   int og_lis_ind=tasks.indexWhere((task)=>task.text==text1);
+                            //   print(og_lis_ind);
+                            //   tasks.removeAt(og_lis_ind);
+                            //
+                            // }
+                            // widget.tasks1.removeAt(index);
+                            // widget.onSaveData?.call();
+                            // taskManager.saveData(widget.tasks1.cast<Task>());
+                          });
                         },
-                        child: const Text('Delete'),
+                        child: const Text('Delete',style: TextStyle(color: Colors.black),),
                       ),
+
                     ],
+
                   ),
                 );
-              }
-              ;
+
+              };
+
+
             },
             child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
               child: ListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(3),
                 ),
                 tileColor: Colors.white,
-                leading: Checkbox(
+                leading:Checkbox(
                   value: task.checkbox, // Use value directly
-                  activeColor: widget.isSwitched
-                      ? const Color(0xff000000)
-                      : const Color(0xff7FC7D9),
+                  activeColor: widget.isSwitched? const Color(0xff000000): const Color(0xff7FC7D9),
                   onChanged: (newBool) {
                     setState(() {
                       task.checkbox = newBool!;
-                      widget.onSaveData?.call();
-                      taskManager.saveData(widget.tasks1.cast<Task>());
+                      DatabaseHelper.updateTask(task.text, task);
+                      // widget.onSaveData?.call();
+                      // taskManager.saveData(widget.tasks1.cast<Task>());
+                      // task.checkbox = !task.checkbox;
+                      // updateTask(task);
+                      // loadTasks();
                     });
                   },
                 ),
-                title: Text(
-                  task.text,
+                title: Text(task.text,
                   style: const TextStyle(fontSize: 18),
                 ),
               ),
-            ));
+            )
+
+        );
+
+
       },
+
+
     );
   }
+
 }
+
+
+
+
+
+

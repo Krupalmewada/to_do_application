@@ -6,7 +6,9 @@ class Task{
   Task({required this.text,required this.checkbox});
   Map<String, dynamic> toMap() {
     return {
-      text : checkbox,
+      // text : checkbox,
+      "text":text,
+      "checkbox":checkbox
     };
   }
   factory Task.fromMap(Map<String, dynamic> map) {
